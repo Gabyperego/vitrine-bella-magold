@@ -1,0 +1,8 @@
+.env
+# data/local_db.json
+uploads/
+vendor/
+*.log
+.DS_Store
+Thumbs.db
+
