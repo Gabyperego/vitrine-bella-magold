@@ -1,42 +1,52 @@
 [
     {
-        "id":  "usr_001",
-        "nome":  "Gaby Perego",
-        "email":  "gaby@dsoft.com.br",
-        "senha_hash":  "$2y$10$f7yh1p1O2zUvBilryaNOo.va16ykBU5wwja6iZjnwdEyObjfkDUvm",
-        "cargo":  "Suporte N2 / Analista",
-        "avatar":  "GP",
-        "ativo":  true,
-        "created_at":  "2026-10-01 15:43:05"
+        "id": "usr_001",
+        "nome": "Gaby Perego",
+        "email": "gaby@dsoft.com.br",
+        "senha_hash": "$2y$10$f7yh1p1O2zUvBilryaNOo.va16ykBU5wwja6iZjnwdEyObjfkDUvm",
+        "cargo": "Suporte N2 \/ Analista",
+        "avatar": "GP",
+        "ativo": true,
+        "created_at": "2026-10-01 15:43:05"
     },
     {
-        "id":  "usr_002",
-        "nome":  "Lucas Silva",
-        "email":  "lucas@dsoft.com.br",
-        "senha_hash":  "$2y$10$J1ox9hoP3auW9cBykMnHnuCSOgCelMqlQNNTwMnoGZ9Ge53FaoB52",
-        "cargo":  "Analista de Suporte",
-        "avatar":  "LS",
-        "ativo":  true,
-        "created_at":  "2026-10-01 15:43:05"
+        "id": "usr_002",
+        "nome": "Lucas Silva",
+        "email": "lucas@dsoft.com.br",
+        "senha_hash": "$2y$10$J1ox9hoP3auW9cBykMnHnuCSOgCelMqlQNNTwMnoGZ9Ge53FaoB52",
+        "cargo": "Analista de Suporte",
+        "avatar": "LS",
+        "ativo": true,
+        "created_at": "2026-10-01 15:43:05"
     },
     {
-        "id":  "usr_003",
-        "nome":  "Fernanda Costa",
-        "email":  "fernanda@dsoft.com.br",
-        "senha_hash":  "$2y$10$0XPn7lLWZeW5E5wcBGTR5uKJB9Ze.oSavtZuHI.RHXpHAuQdKFto2",
-        "cargo":  "Analista de Atendimento",
-        "avatar":  "FC",
-        "ativo":  true,
-        "created_at":  "2026-10-01 15:43:05"
+        "id": "usr_003",
+        "nome": "Fernanda Costa",
+        "email": "fernanda@dsoft.com.br",
+        "senha_hash": "$2y$10$0XPn7lLWZeW5E5wcBGTR5uKJB9Ze.oSavtZuHI.RHXpHAuQdKFto2",
+        "cargo": "Analista de Atendimento",
+        "avatar": "FC",
+        "ativo": true,
+        "created_at": "2026-10-01 15:43:05"
     },
     {
-        "id":  "usr_004",
-        "nome":  "Suporte Geral",
-        "email":  "suporte@dsoft.com.br",
-        "senha_hash":  "$2y$10$xvoyVKPRyU4UI6IFd6JwIubFqTyumccXQQb1dZyIxUbg1S5gHCFje",
-        "cargo":  "Equipe Suporte",
-        "avatar":  "DS",
-        "ativo":  true,
-        "created_at":  "2026-10-01 15:43:05"
+        "id": "usr_004",
+        "nome": "Suporte Geral",
+        "email": "suporte@dsoft.com.br",
+        "senha_hash": "$2y$10$xvoyVKPRyU4UI6IFd6JwIubFqTyumccXQQb1dZyIxUbg1S5gHCFje",
+        "cargo": "Equipe Suporte",
+        "avatar": "DS",
+        "ativo": true,
+        "created_at": "2026-10-01 15:43:05"
+    },
+    {
+        "nome": "Gabriely Pérego",
+        "email": "gabyperego99@gmail.com",
+        "senha_hash": "$2y$10$AMnx0YWT\/286GxfGjfKt9O8djkQJR2XVAx02n4ZiDZNE369TlvgAe",
+        "cargo": "Analista de Suporte",
+        "avatar": "GP",
+        "ativo": true,
+        "id": "usr_6abebe8b7bc6b",
+        "created_at": "2026-10-01 16:11:55"
     }
 ]
