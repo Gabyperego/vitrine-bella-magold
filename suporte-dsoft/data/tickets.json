@@ -1,0 +1,53 @@
+[
+    {
+        "id": "tck_1001",
+        "numero_ticket": "10452",
+        "analista_nome": "Gaby Perego",
+        "cliente_empresa": "Supermercado Central",
+        "data_hora": "2026-10-01 15:43:05",
+        "tipo": "Bug",
+        "status": "Em Aberto",
+        "prioridade": "Alta",
+        "descricao": "Erro ao emitir NFC-e em contingência offline. Rejeição 539: Duplicidade com diferença de chave.",
+        "created_at": "2026-10-01 15:43:05",
+        "updated_at": "2026-10-01 16:00:36"
+    },
+    {
+        "id": "tck_1003",
+        "numero_ticket": "10448",
+        "analista_nome": "Fernanda Costa",
+        "cliente_empresa": "Auto Posto Alvorada",
+        "data_hora": "2026-09-30 15:43:05",
+        "tipo": "Dúvida",
+        "status": "Concluído",
+        "concluido_em": "2026-09-30 15:43:05",
+        "prioridade": "Baixa",
+        "descricao": "Orientação sobre fechamento de caixa diário e conferência de recebíveis em cartão.",
+        "created_at": "2026-09-30 15:43:05"
+    },
+    {
+        "id": "tck_1004",
+        "numero_ticket": "10445",
+        "analista_nome": "Gaby Perego",
+        "cliente_empresa": "Distribuidora Pantanal",
+        "data_hora": "2026-09-29 15:43:05",
+        "tipo": "Melhoria",
+        "status": "Em Aberto",
+        "prioridade": "Média",
+        "descricao": "Ajuste no layout do relatório financeiro de DRE por centro de custo.",
+        "created_at": "2026-09-29 15:43:05"
+    },
+    {
+        "id": "tck_1005",
+        "numero_ticket": "10440",
+        "analista_nome": "Lucas Silva",
+        "cliente_empresa": "Móveis & Design Ltda",
+        "data_hora": "2026-09-28 15:43:05",
+        "tipo": "Bug",
+        "status": "Concluído",
+        "concluido_em": "2026-09-29 15:43:05",
+        "prioridade": "Crítica",
+        "descricao": "Lentidão no sync do banco de dados em horário de pico. Otimizados índices e reiniciado serviço.",
+        "created_at": "2026-09-28 15:43:05"
+    }
+]
