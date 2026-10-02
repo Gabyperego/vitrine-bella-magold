@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dsoft • Suporte & Agenda da Equipe</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Supabase JS Client (CDN Oficial) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Estilos Oficiais dsoft -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- LOGOTIPO DSOFT EM MARCA D'ÁGUA NO FUNDO -->
+<img src="assets/images/logo-dsoft.png" alt="dsoft watermark" class="dsoft-watermark-bg" aria-hidden="true">
+
+<!-- ============================================================
+     TELA DE LOGIN E AUTO-CADASTRO (EXIBIDA QUANDO NÃO LOGADO)
+     ============================================================ -->
+<div id="authSection" class="login-page-body" style="display: none;">
+    <div class="login-card" style="max-width: 460px;">
+        <div class="login-logo-box">
+            <img src="assets/images/logo-dsoft.png" alt="dsoft" class="login-logo-img">
+            <h2 class="login-title" id="authTitle">Agenda da Equipe de Suporte</h2>
+            <p class="login-subtitle" id="authSubtitle">Acesso restrito para analistas dsoft</p>
+        </div>
+
+        <div id="authAlert" class="alert-flash alert-error" style="display: none;"></div>
+
+        <!-- FORMULÁRIO DE LOGIN -->
+        <form id="formLogin" onsubmit="handleLogin(event)">
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label for="loginEmail">E-mail Corporativo</label>
+                <div style="position: relative;">
+                    <i class="bi bi-envelope" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                    <input type="email" id="loginEmail" class="form-control" style="padding-left: 40px;" placeholder="analista@dsoft.com.br" required>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 22px;">
+                <label for="loginSenha">Senha de Acesso</label>
+                <div style="position: relative;">
+                    <i class="bi bi-lock" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                    <input type="password" id="loginSenha" class="form-control" style="padding-left: 40px;" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-action-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Entrar no Sistema</span>
+            </button>
+
+            <div style="margin-top: 18px; text-align: center; font-size: 0.9rem; color: #64748b;">
+                Não tem uma conta de analista?  
+                <a href="javascript:void(0)" onclick="toggleAuthMode('register')" style="color: var(--dsoft-cyan); font-weight: 700; text-decoration: none;">Cadastre-se aqui</a>
+            </div>
+        </form>
+
+        <!-- FORMULÁRIO DE AUTO-CADASTRO -->
+        <form id="formRegister" onsubmit="handleRegister(event)" style="display: none;">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="regNome">Nome Completo <span style="color: red;">*</span></label>
+                <input type="text" id="regNome" class="form-control" placeholder="Ex: Rodrigo Mendes" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="regEmail">E-mail Corporativo <span style="color: red;">*</span></label>
+                <input type="email" id="regEmail" class="form-control" placeholder="rodrigo@dsoft.com.br" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="regCargo">Cargo / Função</label>
+                <input type="text" id="regCargo" class="form-control" placeholder="Ex: Analista de Suporte N1" value="Analista de Suporte">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="regSenha">Defina sua Senha <span style="color: red;">*</span></label>
+                <input type="password" id="regSenha" class="form-control" placeholder="Mínimo 4 caracteres" required>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="regConfirma">Confirme sua Senha <span style="color: red;">*</span></label>
+                <input type="password" id="regConfirma" class="form-control" placeholder="Repita a senha" required>
+            </div>
+
+            <button type="submit" class="btn-action-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;">
+                <i class="bi bi-person-check-fill"></i>
+                <span>Criar Conta & Acessar</span>
+            </button>
+
+            <div style="margin-top: 18px; text-align: center; font-size: 0.9rem; color: #64748b;">
+                Já possui conta cadastrada?  
+                <a href="javascript:void(0)" onclick="toggleAuthMode('login')" style="color: var(--dsoft-cyan); font-weight: 700; text-decoration: none;">Fazer Login</a>
+            </div>
+        </form>
+
+        <!-- BANNER DE STATUS DO SUPABASE -->
+        <div id="supabaseStatusBox" style="margin-top: 24px; padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between;">
+            <span id="supabaseStatusText" style="display: flex; align-items: center; gap: 6px;">
+                <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+                <span>Banco Supabase: Conectado</span>
+            </span>
+            <button type="button" onclick="abrirModalConfigSupabase()" style="background: none; border: none; color: var(--dsoft-cyan); font-weight: 700; cursor: pointer; font-size: 0.8rem;">
+                ⚙️ Configurar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     APLICAÇÃO PRINCIPAL (EXIBIDA QUANDO LOGADO)
+     ============================================================ -->
+<div id="mainApp" class="app-wrapper" style="display: none;">
+    <!-- NAVBAR SUPERIOR -->
+    <header class="navbar-dsoft">
+        <div class="navbar-container">
+            <a href="javascript:void(0)" onclick="navegarPara('dashboard')" class="brand-wrapper">
+                <img src="assets/images/logo-dsoft.png" alt="dsoft Logo" class="brand-logo-img">
+                <div>
+                    <span class="brand-subtag">Equipe de Suporte</span>
+                </div>
+            </a>
+
+            <!-- ABAS DE NAVEGAÇÃO -->
+            <nav class="nav-links">
+                <a href="javascript:void(0)" id="tabNavDashboard" onclick="navegarPara('dashboard')" class="nav-link-btn active">
+                    <i class="bi bi-pie-chart-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="javascript:void(0)" id="tabNavLancamentos" onclick="navegarPara('lancamentos')" class="nav-link-btn">
+                    <i class="bi bi-card-checklist"></i>
+                    <span>Todos os Lançamentos</span>
+                </a>
+                <a href="javascript:void(0)" id="tabNavEquipe" onclick="navegarPara('equipe')" class="nav-link-btn">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Equipe</span>
+                </a>
+            </nav>
+
+            <!-- AÇÕES E PERFIL -->
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <button type="button" class="btn-action-primary" onclick="abrirModalNovoTicket()">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    <span>Novo Lançamento</span>
+                </button>
+
+                <div class="user-profile-box">
+                    <div class="user-avatar" id="headerUserAvatar">GP</div>
+                    <div class="user-details">
+                        <span class="user-name" id="headerUserName">Gaby Perego</span>
+                        <span class="user-role" id="headerUserRole">Analista</span>
+                    </div>
+                    <button type="button" onclick="abrirModalConfigSupabase()" class="btn-icon-action" style="color: #cbd5e1;" title="Configurações do Supabase">
+                        <i class="bi bi-database-fill-gear"></i>
+                    </button>
+                    <a href="javascript:void(0)" onclick="handleLogout()" class="btn-logout" title="Sair do Sistema">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Sair</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ÁREA DE NOTIFICAÇÕES TOAST -->
+    <div id="toastNotification" class="alert-flash alert-success" style="position: fixed; top: 80px; right: 24px; z-index: 9999; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);"></div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-container">
+        <!-- ==========================================
+             ABA 1: DASHBOARD
+             ========================================== -->
+        <section id="viewDashboard" class="view-section">
+            <div class="page-header-row">
+                <div class="page-title-group">
+                    <h1>
+                        <i class="bi bi-speedometer2" style="color: var(--dsoft-cyan);"></i>
+                        <span>Dashboard de Suporte & Atendimentos</span>
+                    </h1>
+                    <p>Acompanhamento dos chamados, produtividade da equipe e indicadores.</p>
+                </div>
+                <button type="button" class="btn-action-primary" onclick="navegarPara('lancamentos')" style="background: #fff; color: var(--dsoft-navy); border: 1px solid #cbd5e1; box-shadow: none;">
+                    <i class="bi bi-table"></i> Ver Todos os Lançamentos
+                </button>
+            </div>
+
+            <!-- PAINEL DE FILTROS DO DASHBOARD -->
+            <div class="filter-panel">
+                <div class="filter-pills-group">
+                    <button type="button" class="filter-pill" id="dashPillHoje" onclick="filtrarDashPeriodo('hoje')">
+                        <i class="bi bi-calendar-day"></i> Hoje (Dia)
+                    </button>
+                    <button type="button" class="filter-pill" id="dashPillSemana" onclick="filtrarDashPeriodo('semana')">
+                        <i class="bi bi-calendar-week"></i> Esta Semana
+                    </button>
+                    <button type="button" class="filter-pill active" id="dashPillMes" onclick="filtrarDashPeriodo('mes')">
+                        <i class="bi bi-calendar-month"></i> Este Mês
+                    </button>
+                    <button type="button" class="filter-pill" id="dashPillTodos" onclick="filtrarDashPeriodo('todos')">
+                        <i class="bi bi-collection"></i> Todos
+                    </button>
+                </div>
+
+                <div class="filter-inputs-group">
+                    <select id="dashSelectAnalista" class="form-select-filter" onchange="recarregarDashboard()">
+                        <option value="">👤 Todos os Analistas</option>
+                    </select>
+
+                    <select id="dashSelectTipo" class="form-select-filter" onchange="recarregarDashboard()">
+                        <option value="">🏷️ Todos os Tipos</option>
+                        <option value="Bug">🐛 Bugs / Erros</option>
+                        <option value="Melhoria">💡 Melhorias</option>
+                        <option value="Dúvida">❓ Dúvidas</option>
+                        <option value="Configuração">⚙️ Configurações</option>
+                        <option value="Treinamento">🎓 Treinamentos</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- CARDS DE MÉTRICAS -->
+            <div class="metrics-grid">
+                <div class="metric-card card-total">
+                    <div class="metric-info">
+                        <h3>Total de Chamados</h3>
+                        <div class="metric-number" id="dashMetricTotal">0</div>
+                        <div class="metric-sub">No período selecionado</div>
+                    </div>
+                    <div class="metric-icon-circle"><i class="bi bi-folder2-open"></i></div>
+                </div>
+
+                <div class="metric-card card-aberto">
+                    <div class="metric-info">
+                        <h3>Em Aberto</h3>
+                        <div class="metric-number" id="dashMetricAbertos" style="color: #0f172a;">0</div>
+                        <div class="metric-sub">Escrita preta na tabela</div>
+                    </div>
+                    <div class="metric-icon-circle"><i class="bi bi-clock-history"></i></div>
+                </div>
+
+                <div class="metric-card card-concluido">
+                    <div class="metric-info">
+                        <h3>Finalizados</h3>
+                        <div class="metric-number" id="dashMetricConcluidos" style="color: #16a34a;">0</div>
+                        <div class="metric-sub" id="dashMetricTaxa">0% de resolução</div>
+                    </div>
+                    <div class="metric-icon-circle"><i class="bi bi-check-circle-fill"></i></div>
+                </div>
+
+                <div class="metric-card card-bug">
+                    <div class="metric-info">
+                        <h3>Bugs / Erros</h3>
+                        <div class="metric-number" id="dashMetricBugs" style="color: #dc2626;">0</div>
+                        <div class="metric-sub">Problemas reportados</div>
+                    </div>
+                    <div class="metric-icon-circle"><i class="bi bi-bug-fill"></i></div>
+                </div>
+
+                <div class="metric-card card-melhoria">
+                    <div class="metric-info">
+                        <h3>Melhorias</h3>
+                        <div class="metric-number" id="dashMetricMelhorias" style="color: #7c3aed;">0</div>
+                        <div class="metric-sub">Sugestões de produto</div>
+                    </div>
+                    <div class="metric-icon-circle"><i class="bi bi-lightbulb-fill"></i></div>
+                </div>
+            </div>
+
+            <!-- TABELA RECENTE DO DASHBOARD -->
+            <div class="table-card">
+                <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="font-size: 1rem; font-weight: 800; color: var(--dsoft-navy); display: flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-clock-history" style="color: var(--dsoft-cyan);"></i>
+                        <span>Últimos Atendimentos da Equipe</span>
+                    </h3>
+                    <a href="javascript:void(0)" onclick="navegarPara('lancamentos')" style="font-size: 0.85rem; font-weight: 700; color: var(--dsoft-cyan); text-decoration: none;">
+                        Ver todos &rarr;
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="dsoft-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Ticket</th>
+                                <th>Data / Hora</th>
+                                <th>Analista</th>
+                                <th>Cliente / Empresa</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Status</th>
+                                <th style="text-align: right; width: 140px;">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             ABA 2: TODOS OS LANÇAMENTOS
+             ========================================== -->
+        <section id="viewLancamentos" class="view-section" style="display: none;">
+            <div class="page-header-row">
+                <div class="page-title-group">
+                    <h1>
+                        <i class="bi bi-card-checklist" style="color: var(--dsoft-cyan);"></i>
+                        <span>Todos os Lançamentos da Equipe</span>
+                    </h1>
+                    <p>Lista compartilhada: o que qualquer analista cadastrar aparece aqui para todos em tempo real.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-action-primary" onclick="window.print()" style="background: #fff; color: var(--dsoft-navy); border: 1px solid #cbd5e1; box-shadow: none;">
+                        <i class="bi bi-printer"></i> Imprimir / PDF
+                    </button>
+                    <button type="button" class="btn-action-primary" onclick="abrirModalNovoTicket()">
+                        <i class="bi bi-plus-circle-fill"></i> + Novo Lançamento
+                    </button>
+                </div>
+            </div>
+
+            <!-- FILTROS DOS LANÇAMENTOS -->
+            <div class="filter-panel" style="flex-direction: column; align-items: stretch; gap: 14px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                    <div class="filter-pills-group">
+                        <button type="button" class="filter-pill active" id="pillStatusTodos" onclick="filtrarStatusLancamentos('')">Todos os Chamados</button>
+                        <button type="button" class="filter-pill" id="pillStatusAberto" onclick="filtrarStatusLancamentos('Em Aberto')" style="color: #0f172a;">
+                            <i class="bi bi-clock-fill"></i> Em Aberto (Preto)
+                        </button>
+                        <button type="button" class="filter-pill" id="pillStatusConcluido" onclick="filtrarStatusLancamentos('Concluído')" style="color: #16a34a;">
+                            <i class="bi bi-check-circle-fill"></i> Concluídos (Verde)
+                        </button>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 16px; font-size: 0.8rem; font-weight: 700;">
+                        <span style="display: flex; align-items: center; gap: 6px; color: #0f172a;">
+                            <span style="width: 12px; height: 12px; background: #0f172a; border-radius: 3px; display: inline-block;"></span>
+                            Em Aberto: Escrita Preta
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 6px; color: #166534;">
+                            <span style="width: 12px; height: 12px; background: #a7f3d0; border: 1px solid #16a34a; border-radius: 3px; display: inline-block;"></span>
+                            Concluído: Tonalidade Verde
+                        </span>
+                    </div>
+                </div>
+
+                <div class="filter-inputs-group" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <div style="position: relative;">
+                        <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                        <input type="text" id="inputBuscaLancamentos" class="form-input-search" style="width: 100%; padding-left: 36px;" placeholder="Buscar ticket, cliente ou descrição..." oninput="recarregarLancamentos()">
+                    </div>
+
+                    <select id="selectAnalistaLancamentos" class="form-select-filter" onchange="recarregarLancamentos()">
+                        <option value="">👤 Todos os Analistas</option>
+                    </select>
+
+                    <select id="selectTipoLancamentos" class="form-select-filter" onchange="recarregarLancamentos()">
+                        <option value="">🏷️ Todos os Tipos</option>
+                        <option value="Bug">🐛 Bugs / Erros</option>
+                        <option value="Melhoria">💡 Melhorias</option>
+                        <option value="Dúvida">❓ Dúvidas</option>
+                        <option value="Configuração">⚙️ Configurações</option>
+                        <option value="Treinamento">🎓 Treinamentos</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TABELA COMPLETA -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="dsoft-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 110px;">Nº Ticket</th>
+                                <th style="width: 150px;">Data / Hora</th>
+                                <th style="width: 170px;">Analista</th>
+                                <th style="width: 200px;">Cliente / Empresa</th>
+                                <th style="width: 140px;">Como Entrou</th>
+                                <th>Descrição do Atendimento</th>
+                                <th style="width: 130px;">Status</th>
+                                <th style="text-align: right; width: 170px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lancamentosTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             ABA 3: EQUIPE DE SUPORTE (GESTÃO & SENHAS)
+             ========================================== -->
+        <section id="viewEquipe" class="view-section" style="display: none;">
+            <div class="page-header-row">
+                <div class="page-title-group">
+                    <h1>
+                        <i class="bi bi-people-fill" style="color: var(--dsoft-cyan);"></i>
+                        <span>Equipe de Suporte dsoft</span>
+                    </h1>
+                    <p>Cadastre novos analistas, edite e-mails de login e redefina senhas a qualquer momento.</p>
+                </div>
+                <button type="button" class="btn-action-primary" onclick="abrirModalNovoAnalista()">
+                    <i class="bi bi-person-plus-fill"></i> + Cadastrar Novo Analista
+                </button>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="dsoft-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">Avatar</th>
+                                <th>Nome do Analista</th>
+                                <th>E-mail de Login</th>
+                                <th>Cargo / Função</th>
+                                <th style="text-align: center;">Total Chamados</th>
+                                <th style="text-align: center;">Em Aberto</th>
+                                <th style="text-align: center;">Concluídos</th>
+                                <th style="text-align: right; width: 200px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipeTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer style="margin-top: auto; padding: 18px 24px; text-align: center; font-size: 0.82rem; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #ffffff;">
+        <strong>dsoft</strong> • Software de Gestão — Central de Chamados & Agenda da Equipe de Suporte (Netlify + Supabase)
+    </footer>
+</div>
+
+<!-- ============================================================
+     MODAIS DO SISTEMA
+     ============================================================ -->
+
+<!-- MODAL NOVO TICKET -->
+<div class="modal-overlay" id="modalNovoTicket">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="bi bi-ticket-perforated-fill"></i> <span>Novo Lançamento de Atendimento</span></h3>
+            <button type="button" class="btn-close-modal" onclick="fecharModalNovoTicket()">&times;</button>
+        </div>
+        <form id="formNovoTicket" onsubmit="handleSalvarTicket(event)">
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tckNumero">Número do Ticket <span style="color: red;">*</span></label>
+                        <input type="text" id="tckNumero" class="form-control" placeholder="Ex: 10455" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tckAnalista">Analista Responsável <span style="color: red;">*</span></label>
+                        <select id="tckAnalista" class="form-control" required></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tckCliente">Cliente / Empresa <span style="color: red;">*</span></label>
+                        <input type="text" id="tckCliente" class="form-control" placeholder="Ex: Supermercado Central" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tckData">Data e Hora <span style="color: red;">*</span></label>
+                        <input type="datetime-local" id="tckData" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tckTipo">Como Entrou (Tipo) <span style="color: red;">*</span></label>
+                        <select id="tckTipo" class="form-control" required>
+                            <option value="Bug">🐛 Bug / Erro de Sistema</option>
+                            <option value="Melhoria">💡 Melhoria / Solicitação</option>
+                            <option value="Dúvida">❓ Dúvida / Suporte Geral</option>
+                            <option value="Configuração">⚙️ Configuração / Implantação</option>
+                            <option value="Treinamento">🎓 Treinamento</option>
+                            <option value="Outro">📁 Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tckStatus">Status Inicial <span style="color: red;">*</span></label>
+                        <select id="tckStatus" class="form-control" required>
+                            <option value="Em Aberto">⏳ Em Aberto (escrita preta)</option>
+                            <option value="Concluído">✅ Concluído (tonalidade verde)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group form-group-full">
+                        <label for="tckPrioridade">Prioridade</label>
+                        <select id="tckPrioridade" class="form-control">
+                            <option value="Média">Média</option>
+                            <option value="Baixa">Baixa</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Crítica">🚨 Crítica / Urgente</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group form-group-full">
+                        <label for="tckDescricao">Descrição do Atendimento <span style="color: red;">*</span></label>
+                        <textarea id="tckDescricao" rows="4" class="form-control" placeholder="Descreva os detalhes do atendimento, erro reportado ou melhoria..." required></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-action-primary" style="background: #e2e8f0; color: #475569; box-shadow: none;" onclick="fecharModalNovoTicket()">Cancelar</button>
+                <button type="submit" class="btn-action-primary"><i class="bi bi-check-lg"></i> Gravar Lançamento</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL CADASTRAR ANALISTA -->
+<div class="modal-overlay" id="modalNovoAnalista">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="bi bi-person-plus-fill"></i> <span>Cadastrar Novo Analista</span></h3>
+            <button type="button" class="btn-close-modal" onclick="fecharModalNovoAnalista()">&times;</button>
+        </div>
+        <form id="formNovoAnalista" onsubmit="handleSalvarAnalista(event)">
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group form-group-full">
+                        <label for="anNome">Nome Completo <span style="color: red;">*</span></label>
+                        <input type="text" id="anNome" class="form-control" placeholder="Ex: Rodrigo Mendes" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="anEmail">E-mail de Login <span style="color: red;">*</span></label>
+                        <input type="email" id="anEmail" class="form-control" placeholder="rodrigo@dsoft.com.br" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="anCargo">Cargo / Função</label>
+                        <input type="text" id="anCargo" class="form-control" placeholder="Analista de Suporte" value="Analista de Suporte">
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="anSenha">Senha Inicial de Acesso <span style="color: red;">*</span></label>
+                        <input type="password" id="anSenha" class="form-control" placeholder="Mínimo 4 caracteres" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-action-primary" style="background: #e2e8f0; color: #475569; box-shadow: none;" onclick="fecharModalNovoAnalista()">Cancelar</button>
+                <button type="submit" class="btn-action-primary"><i class="bi bi-check-lg"></i> Salvar Cadastro</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL EDITAR ANALISTA / SENHA -->
+<div class="modal-overlay" id="modalEditarAnalista">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i class="bi bi-person-gear"></i> <span>Editar Analista & Alterar Senha</span></h3>
+            <button type="button" class="btn-close-modal" onclick="fecharModalEditarAnalista()">&times;</button>
+        </div>
+        <form id="formEditarAnalista" onsubmit="handleAtualizarAnalista(event)">
+            <input type="hidden" id="editAnId">
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group form-group-full">
+                        <label for="editAnNome">Nome Completo <span style="color: red;">*</span></label>
+                        <input type="text" id="editAnNome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAnEmail">E-mail de Login (Acesso) <span style="color: red;">*</span></label>
+                        <input type="email" id="editAnEmail" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAnCargo">Cargo / Função</label>
+                        <input type="text" id="editAnCargo" class="form-control" required>
+                    </div>
+                    <div class="form-group form-group-full" style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <label for="editAnSenha" style="color: var(--dsoft-navy); font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                            <i class="bi bi-key-fill" style="color: var(--dsoft-cyan);"></i> Redefinir Senha de Acesso
+                        </label>
+                        <input type="password" id="editAnSenha" class="form-control" placeholder="Digite uma nova senha ou deixe vazio para manter">
+                        <span style="font-size: 0.78rem; color: #64748b; margin-top: 4px; display: block;">
+                            ℹ️ Deixe em branco se não quiser alterar a senha atual.
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-action-primary" style="background: #e2e8f0; color: #475569; box-shadow: none;" onclick="fecharModalEditarAnalista()">Cancelar</button>
+                <button type="submit" class="btn-action-primary"><i class="bi bi-check-lg"></i> Atualizar Dados & Senha</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL CONFIGURAÇÃO SUPABASE -->
+<div class="modal-overlay" id="modalConfigSupabase">
+    <div class="modal-box" style="max-width: 520px;">
+        <div class="modal-header">
+            <h3><i class="bi bi-database-fill-gear"></i> <span>Conexão com o Supabase</span></h3>
+            <button type="button" class="btn-close-modal" onclick="fecharModalConfigSupabase()">&times;</button>
+        </div>
+        <form onsubmit="salvarConfigSupabase(event)">
+            <div class="modal-body">
+                <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 16px;">
+                    Insira aqui as credenciais do seu projeto Supabase para que todos os dados fiquem sincronizados na nuvem em tempo real:
+                </p>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label for="cfgSupabaseUrl">Project URL do Supabase</label>
+                    <input type="text" id="cfgSupabaseUrl" class="form-control" placeholder="https://xyz.supabase.co" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label for="cfgSupabaseKey">Project API Key (anon public)</label>
+                    <input type="text" id="cfgSupabaseKey" class="form-control" placeholder="eyJhbGciOi..." required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-action-primary" style="background: #e2e8f0; color: #475569; box-shadow: none;" onclick="fecharModalConfigSupabase()">Fechar</button>
+                <button type="submit" class="btn-action-primary"><i class="bi bi-check-lg"></i> Salvar & Conectar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- SCRIPTS DA APLICAÇÃO -->
+<script src="assets/js/config.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/app-spa.js"></script>
+</body>
+</html>
